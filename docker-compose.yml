@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  praxis_bff:
+    container_name: praxis_bff
+    image: ${DOCKER_REGISTRY-}praxisbff
+    build:
+      context: .
+      dockerfile: Praxis.Bff/Dockerfile
+    networks:
+      - praxis_frontend
+  
+  praxis_frontend:
+    container_name: praxis_frontend
+    image: ${DOCKER_REGISTRY-}praxisfrontend
+    build:
+      context: .
+      dockerfile: Praxis.Bff/praxis-react/Dockerfile
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - praxis_frontend
+
+  nginx:
+    container_name: praxis
+    image: nginx:1.24.0
+    volumes:
+     - ./nginx/templates:/etc/nginx/templates
+    environment:
+     - NGINX_HOST=praxis
+     - NGINX_PORT=7015
+    networks:
+      - praxis_frontend
+    command: [nginx-debug, '-g', 'daemon off;']
+
+
+networks:
+  praxis_frontend:
+    driver: bridge

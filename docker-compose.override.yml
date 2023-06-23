@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+  praxis_bff:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:7013
+      - Kestrel__Certificates__Default__Path=/root/.aspnet/https/dev_Praxis.pfx
+    ports:
+      - "7013:7013"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+  
+  praxis_frontend:
+    environment:
+      - NODE_ENV=Development
+    ports:
+      - "7014:7014"
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ./Praxis.Bff/praxis-react:/app
+  
+  nginx:
+    ports:
+      - "7015:7015"
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    
