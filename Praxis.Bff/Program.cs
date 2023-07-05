@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Praxis.Bff.Models;
 using Serilog;
 using System;
 using System.Security.Claims;
@@ -52,11 +53,12 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.MapGet("/api/login", (ClaimsPrincipal user) =>
+    app.MapGet("/api/login/google", (ClaimsPrincipal user) =>
     {
-        var properties = new AuthenticationProperties
+        var properties = new GoogleChallengeProperties
         {
-            RedirectUri = "/api/hello"
+            RedirectUri = "/",
+            Prompt = "select_account"
         };
 
         return Results.Challenge(properties, new[] { GoogleDefaults.AuthenticationScheme });
@@ -66,17 +68,26 @@ try
     {
         var properties = new AuthenticationProperties
         {
-            RedirectUri = "/api/hello"
+            RedirectUri = "/"
         };
 
         return Results.SignOut(properties, new[] { CookieAuthenticationDefaults.AuthenticationScheme });
     });
 
-    app.MapGet("/api/hello", (ClaimsPrincipal user) => {
+    app.MapGet("/api/user", (ClaimsPrincipal user) => {
         string? name = user?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
         string? email = user?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
 
-        return "Hello " + (name?? "World") + "!";   
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return null;
+        }
+
+        return new User
+        {
+            Name = name ?? string.Empty,
+            Email = email,
+        };
         });
 
     app.Run();

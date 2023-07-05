@@ -4,7 +4,7 @@ import Navigation from './Navigation';
 function NavigationButton() {
     const [isOpen, setIsOpen] = useState(false);
     const toggleButton = () => { setIsOpen(!isOpen); };
-    const closeButtonCLick = () => { setIsOpen(false); };
+    const closeButtonClick = () => { setIsOpen(false); };
     return (
         <div className="sm:hidden">
             <div className="ml-3 hover:text-violet-800">
@@ -16,9 +16,9 @@ function NavigationButton() {
                         }
                     </svg>
                 </button>
-                { isOpen && <button onClick={closeButtonCLick} tabIndex={-1} className="fixed z-10 inset-0 h-full w-full bg-violet-light opacity-50 cursor-default"></button> }
+                { isOpen && <button onClick={closeButtonClick} tabIndex={-1} className="fixed z-10 inset-0 h-full w-full bg-violet-light opacity-50 cursor-default"></button> }
             </div>
-            { isOpen && <div onClick={closeButtonCLick} className="absolute z-10 right-0 mt-2 w-32 bg-violet-dark rounded-t-lg rounded-b-2xl shadow-xl">
+            { isOpen && <div onClick={closeButtonClick} className="absolute z-10 right-0 mt-2 w-32 bg-violet-dark rounded-t-lg rounded-b-2xl shadow-xl">
                 <Navigation />
             </div> }
         </div>
