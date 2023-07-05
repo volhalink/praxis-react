@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+
+.headerIcon {
+    @apply w-6 h-6 sm:w-8 sm:h-8
+}
+
+.headerIconSmall {
+    @apply w-4 h-4 sm:w-6 sm:h-6
+}
+
+@tailwind utilities;

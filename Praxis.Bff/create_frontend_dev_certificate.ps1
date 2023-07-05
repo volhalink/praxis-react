@@ -1,0 +1,1 @@
+. ..\create_dev_certificate.ps1 -projectname "Praxis" -domain "praxis", "praxis_bff", "praxis_frontend" -pwdvalue  "Praxis certificate password" -shouldsavekey $true
