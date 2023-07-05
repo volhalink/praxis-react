@@ -1,10 +1,21 @@
 version: '3.4'
 
 services:
+  mongo:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin-password
+      - MONGO_INITDB_DATABASE=praxis
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ./Praxis.Bff/mongodb:/data/db
+      - ./Praxis.Bff/data/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
   praxis_bff:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:7013
+      - MongoDB__ConnectionString=mongodb://api:dev-pass@praxis_mongodb:27017/?authSource=praxis
       - Kestrel__Certificates__Default__Path=/root/.aspnet/https/dev_Praxis.pfx
     ports:
       - "7013:7013"
@@ -20,7 +31,7 @@ services:
     volumes:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ./Praxis.Bff/praxis-react:/app
-  
+
   nginx:
     ports:
       - "7015:7015"

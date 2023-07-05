@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Praxis.Bff.Models;
+using Praxis.Bff.Services;
 using Serilog;
 using System;
 using System.Security.Claims;
@@ -22,6 +23,10 @@ try
         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
         .Enrich.FromLogContext()
         .ReadFrom.Configuration(ctx.Configuration));
+
+    builder.Services.Configure<PraxisDatabaseSettings>(
+    builder.Configuration.GetSection("MongoDB"));
+    builder.Services.AddSingleton<ProfilesService>();
 
     builder.Services
         .AddAuthentication(options =>
@@ -53,18 +58,18 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.MapGet("/api/login/google", (ClaimsPrincipal user) =>
+    app.MapGet("/api/login/google", () =>
     {
         var properties = new GoogleChallengeProperties
         {
-            RedirectUri = "/",
+            RedirectUri = "/api/setuser",
             Prompt = "select_account"
         };
 
         return Results.Challenge(properties, new[] { GoogleDefaults.AuthenticationScheme });
     });
 
-    app.MapGet("/api/logout", (ClaimsPrincipal user) =>
+    app.MapGet("/api/logout", () =>
     {
         var properties = new AuthenticationProperties
         {
@@ -72,6 +77,19 @@ try
         };
 
         return Results.SignOut(properties, new[] { CookieAuthenticationDefaults.AuthenticationScheme });
+    });
+
+    app.MapGet("/api/setuser", async (ClaimsPrincipal user, ProfilesService profilesService) =>
+    {
+        string? name = user?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
+        string? email = user?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            await profilesService.AddOrUpdateProfile(name ?? email, email);
+        }
+
+        return Results.Redirect("/");
     });
 
     app.MapGet("/api/user", (ClaimsPrincipal user) => {

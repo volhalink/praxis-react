@@ -1,6 +1,14 @@
 version: '3.4'
 
 services:
+  mongo:
+    container_name: praxis_mongodb
+    image: mongo:6.0.6-jammy
+    ports:
+      - "7016:27017"
+    networks:
+      - praxis_mongodb
+
   praxis_bff:
     container_name: praxis_bff
     image: ${DOCKER_REGISTRY-}praxisbff
@@ -8,6 +16,7 @@ services:
       context: .
       dockerfile: Praxis.Bff/Dockerfile
     networks:
+      - praxis_mongodb
       - praxis_frontend
   
   praxis_frontend:
@@ -36,4 +45,6 @@ services:
 
 networks:
   praxis_frontend:
+    driver: bridge
+  praxis_mongodb:
     driver: bridge
