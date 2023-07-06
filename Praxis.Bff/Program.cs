@@ -1,14 +1,10 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Praxis.Bff.Models;
+using MongoDB.Driver;
+using Praxis.Bff.Endpoints;
 using Praxis.Bff.Services;
 using Serilog;
-using System;
-using System.Security.Claims;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -24,9 +20,12 @@ try
         .Enrich.FromLogContext()
         .ReadFrom.Configuration(ctx.Configuration));
 
-    builder.Services.Configure<PraxisDatabaseSettings>(
-    builder.Configuration.GetSection("MongoDB"));
-    builder.Services.AddSingleton<ProfilesService>();
+    var mongoClient = new MongoClient(builder.Configuration["MongoDB:ConnectionString"]);
+    var mongoDatabase = mongoClient.GetDatabase(builder.Configuration["MongoDB:DatabaseName"]);
+    var profilesService = new ProfilesService(mongoDatabase, builder.Configuration["MongoDB:ProfilesCollectionName"]);
+
+    builder.Services.AddSingleton<IProfilesService>(profilesService);
+    builder.Services.AddSingleton<IHabitsService>(profilesService);
 
     builder.Services
         .AddAuthentication(options =>
@@ -34,7 +33,18 @@ try
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
         })
-        .AddCookie()
+        .AddCookie(options =>
+        {
+            options.Events.OnSignedIn = async (context) =>
+            {
+                var name = context.Principal?.GetName();
+                var email = context.Principal?.GetEmail();
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    await profilesService.AddProfileAsync(email, name);
+                }
+            };
+        })
         .AddGoogle(googleOptions =>
         {
             googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
@@ -58,55 +68,9 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.MapGet("/api/login/google", () =>
-    {
-        var properties = new GoogleChallengeProperties
-        {
-            RedirectUri = "/api/setuser",
-            Prompt = "select_account"
-        };
-
-        return Results.Challenge(properties, new[] { GoogleDefaults.AuthenticationScheme });
-    });
-
-    app.MapGet("/api/logout", () =>
-    {
-        var properties = new AuthenticationProperties
-        {
-            RedirectUri = "/"
-        };
-
-        return Results.SignOut(properties, new[] { CookieAuthenticationDefaults.AuthenticationScheme });
-    });
-
-    app.MapGet("/api/setuser", async (ClaimsPrincipal user, ProfilesService profilesService) =>
-    {
-        string? name = user?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
-        string? email = user?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-
-        if (!string.IsNullOrWhiteSpace(email))
-        {
-            await profilesService.AddOrUpdateProfile(name ?? email, email);
-        }
-
-        return Results.Redirect("/");
-    });
-
-    app.MapGet("/api/user", (ClaimsPrincipal user) => {
-        string? name = user?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
-        string? email = user?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            return null;
-        }
-
-        return new User
-        {
-            Name = name ?? string.Empty,
-            Email = email,
-        };
-        });
+    LoginEndpoints.Map(app);
+    UserEndpoints.Map(app);
+    HabitsEndpoints.Map(app);
 
     app.Run();
 }
