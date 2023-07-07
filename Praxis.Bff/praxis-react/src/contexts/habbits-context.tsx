@@ -1,6 +1,7 @@
 import { Dispatch, createContext, useContext, useReducer } from 'react';
 
 export interface Habit {
+    id: string | null
     name: string
 }
 
@@ -8,7 +9,7 @@ interface HabitsState {
     habits: Habit[],
 }
 
-export type HabitDispatchAction = "getall" | "add";
+export type HabitDispatchAction = "getall" | "add" | "delete";
 
 export interface HabitsDispatch {
     type: HabitDispatchAction,
@@ -64,6 +65,12 @@ export function HabitsProvider(props: PropsType) {
                 ...oldState,
                 habits: oldState.habits.concat([action.data as Habit])
              } : oldState;
+        case "delete":
+                const habit = action.data as Habit;
+                return action.data? {
+                    ...oldState,
+                    habits: oldState.habits.filter((h, i) => h.id !== habit.id)
+                 } : oldState;
         default: {
             throw Error('Unknown action: ' + action.type);
         }

@@ -6,5 +6,7 @@ namespace Praxis.Bff.Services
     {
         IList<Habit> GetHabits(string email);
         Task<Habit?> AddHabitAsync(string email, Habit habbit);
+
+        Task<bool> DeleteHabitAsync(string email, string habitId);
     }
 }

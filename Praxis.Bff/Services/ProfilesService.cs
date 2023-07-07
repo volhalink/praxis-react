@@ -53,5 +53,13 @@ namespace Praxis.Bff.Services
                 Name = newHabbit.Name,
             } : null;
         }
+
+        public async Task<bool> DeleteHabitAsync(string email, string habitId)
+        {
+            var updateDefinition = Builders<ProfileDto>.Update.PullFilter(p => p.Habits, h => h.Id == habitId);
+            var result = await _profilesCollection.UpdateOneAsync(p => p.Email == email, updateDefinition);
+
+            return result.IsAcknowledged;
+        }
     }
 }

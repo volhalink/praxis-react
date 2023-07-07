@@ -26,6 +26,18 @@ namespace Praxis.Bff.Endpoints
 
                 return result;
             });
+
+            app.MapDelete("/api/habits/", async (string habitId, ClaimsPrincipal user, IHabitsService habitsService) =>
+            {
+                string? email = user?.GetEmail();
+                var result = false;
+                if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(habitId))
+                {
+                    result = await habitsService.DeleteHabitAsync(email, habitId);
+                }
+
+                return result;
+            });
         }
     }
 }
