@@ -7,9 +7,10 @@ export interface Habit {
 
 interface HabitsState {
     habits: Habit[],
+    selectedHabit: Habit | null
 }
 
-export type HabitDispatchAction = "getall" | "add" | "delete";
+export type HabitDispatchAction = "getall" | "add" | "delete" | "select" | "deselect";
 
 export interface HabitsDispatch {
     type: HabitDispatchAction,
@@ -28,6 +29,7 @@ export function HabitsProvider(props: PropsType) {
     const initialHabits: Habit[] = [];
     const initialState = {
         habits: initialHabits,
+        selectedHabit: null
     };
     const [habitsState, habitsDispatch] = useReducer(
       habbitsReducer,
@@ -66,11 +68,22 @@ export function HabitsProvider(props: PropsType) {
                 habits: oldState.habits.concat([action.data as Habit])
              } : oldState;
         case "delete":
-                const habit = action.data as Habit;
-                return action.data? {
+                const deleteHabit = action.data as Habit;
+                return deleteHabit? {
                     ...oldState,
-                    habits: oldState.habits.filter((h, i) => h.id !== habit.id)
+                    habits: oldState.habits.filter((h, i) => h.id !== deleteHabit.id)
                  } : oldState;
+        case "select":
+            const selectHabit = action.data as Habit;
+            return  selectHabit?  {
+                ...oldState,
+                selectedHabit: selectHabit
+            } : oldState;
+        case "deselect":
+            return  {
+                ...oldState,
+                selectedHabit: null
+            };
         default: {
             throw Error('Unknown action: ' + action.type);
         }

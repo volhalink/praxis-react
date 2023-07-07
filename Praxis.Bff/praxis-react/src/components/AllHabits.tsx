@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import { getAllHabitsAsync, addHabitAsync, deleteHabitAsync } from '../services/habbits-service';
 import { Habit, HabitsProvider, useHabits, useHabitsDispatch } from '../contexts/habbits-context';
+import HabitDetails from './HabitDetails';
 
 function AddHabitForm(){
     const habbitsDispatch = useHabitsDispatch();
@@ -43,6 +44,15 @@ function HabitsList() {
         deleteHabitAsync(habit, habitsDispatch)
     };
 
+    const selectHabit = (habit: Habit) => {
+        if(habitsDispatch){
+            habitsDispatch({
+                type: "select",
+                data: habit
+            })
+        }
+    }
+
     useEffect(() => {
         getAllHabitsAsync(habitsDispatch);
     }, [habitsDispatch]);
@@ -51,7 +61,9 @@ function HabitsList() {
         <div className="">{habitsState?.habits.map(h => 
             <div className="mt-3 flex flex-nowrap justify-between items-center border-b-2 border-b-violet-dark">
                 <div className="grow">
-                    {h.name}
+                    <button onClick={() => selectHabit(h)}>
+                        {h.name}
+                    </button>
                 </div>
                 <div className="ml-2 grow-0">
                     <button onClick={() => {onClickDelete(h)}}>
@@ -65,21 +77,32 @@ function HabitsList() {
     );
 }
 
-function AllHabbits() {
+function AllHabits() {
+    const habitsState = useHabits();
     return (
-        <section className="grid content-start min-h-screen">
+        <section className="grid grid-cols-1 sm:grid-cols-3 content-start min-h-screen"> 
             <div className="flex justify-around sm:justify-start">
-                <div className="p-5 w-full sm:max-w-sm">
-                    <HabitsProvider>
+                <div className="p-5 w-full hidden sm:block sm:max-w-sm">                 
                         <div className="">
                             <AddHabitForm />
                             <HabitsList />
                         </div>
-                    </HabitsProvider>
                 </div>
+                <div className="p-5 w-full sm:hidden">
+                {habitsState?.selectedHabit?
+                          <HabitDetails habit={habitsState?.selectedHabit}></HabitDetails>
+                        : <div className="">
+                            <AddHabitForm />
+                            <HabitsList />
+                        </div>
+                }
+                </div>
+            </div>
+            <div className="m-5 col-span-2 hidden sm:block">
+                {habitsState?.selectedHabit && <HabitDetails habit={habitsState?.selectedHabit}></HabitDetails>}
             </div>
         </section>
     );
 }
 
-export default AllHabbits;
+export default AllHabits;
