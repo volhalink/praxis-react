@@ -53,10 +53,6 @@ function HabitsList() {
         }
     }
 
-    useEffect(() => {
-        getAllHabitsAsync(habitsDispatch);
-    }, [habitsDispatch]);
-
     return (
         <div className="">{habitsState?.habits.map(h => 
             <div className="mt-3 flex flex-nowrap justify-between items-center border-b-2 border-b-violet-dark">
