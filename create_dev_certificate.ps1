@@ -1,6 +1,6 @@
 #Requires -Version 7.3
 
-param ($projectname, [string[]]$domain, $pwdvalue, $shouldsavekey=$false)
+param ($projectname, [string[]]$domain, $pwdvalue, $shouldsavekey=$false, $shouldsavesecrets=$true)
 
 $pwd = ConvertTo-SecureString -String $pwdvalue -Force -AsPlainText
 
@@ -41,7 +41,9 @@ $pfxnewpath = Join-Path -Path $sharedcertfolder -ChildPath $pfxname
 #By default, extended properties and the entire chain are exported
 Export-PfxCertificate -Cert $certpath -FilePath $pfxnewpath -Password $pwd
 
-dotnet user-secrets init
-dotnet user-secrets set "Kestrel:Certificates:Default:Password" $pwdvalue
-# use the .pfx certificate from the shared folder on the local run
-dotnet user-secrets set "Kestrel:Certificates:Default:Path" $pfxnewpath
+if($shouldsavesecrets){
+	dotnet user-secrets init
+	dotnet user-secrets set "Kestrel:Certificates:Default:Password" $pwdvalue
+	# use the .pfx certificate from the shared folder on the local run
+	dotnet user-secrets set "Kestrel:Certificates:Default:Path" $pfxnewpath
+}

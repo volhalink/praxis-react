@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Route, Routes as ReactRoutes } from 'react-router-dom';
 import Home from './components/Home';
-import AllHabbits from './components/AllHabbits';
-import CurrentHabbits from './components/CurrentHabbits';
+import AllHabits from './components/AllHabits';
+import CurrentHabits from './components/CurrentHabits';
 import Today from './components/Today';
 
 export default class Routes extends Component {
@@ -11,8 +11,8 @@ export default class Routes extends Component {
         return (
             <ReactRoutes>
                 <Route path="/" element={<Home/>} />
-                <Route path="/all" element={<AllHabbits/>} />
-                <Route path="/current" element={<CurrentHabbits/>} />
+                <Route path="/all" element={<AllHabits/>} />
+                <Route path="/current" element={<CurrentHabits/>} />
                 <Route path="/today" element={<Today/>} />
             </ReactRoutes>
     );

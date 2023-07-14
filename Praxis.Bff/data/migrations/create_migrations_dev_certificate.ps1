@@ -1,0 +1,1 @@
+. ..\..\..\create_dev_certificate.ps1 -projectname "Praxis_migrations" -domain "praxis_migrations", "praxis_migrations_api", "praxis_migrations_ui" -pwdvalue  "Praxis migrationscertificate password" -shouldsavekey $true -shouldsavesecrets $false

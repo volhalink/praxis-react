@@ -1,17 +1,23 @@
-import React, { Component } from 'react';
+import { useEffect } from 'react';
+import { getAllHabitsAsync } from '../services/habbits-service';
+import { useHabitsDispatch } from '../contexts/habbits-context';
 
 interface PropsType {
     children: JSX.Element
 }
 
-class Container extends Component<PropsType, {}> {
-    render() {
-        return (
-            <main role="main" className="">
-                {this.props.children} 
-            </main>
-        );
-    }
+function Container(props: PropsType) {
+    const habitsDispatch = useHabitsDispatch();
+
+    useEffect(() => {
+        getAllHabitsAsync(habitsDispatch);
+    }, [habitsDispatch]);
+
+    return (
+        <main role="main" className="">
+            {props.children} 
+        </main>
+    );
 }
 
 export default Container;

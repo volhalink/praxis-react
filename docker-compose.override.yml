@@ -1,15 +1,34 @@
 version: '3.4'
 
 services:
+  scheduler:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scheduler/config.ini:/etc/ofelia/config.ini
+
   mongo:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin-password
-      - MONGO_INITDB_DATABASE=praxis
+      - MONGO_INITDB_DATABASE=admin
+      - MONGO_BACKUP_USERNAME=praxis-backup
+      - MONGO_BACKUP_PASSWORD=praxis-backup-dev-pass
+      - MONGO_RESTORE_USERNAME=praxis-restore
+      - MONGO_RESTORE_PASSWORD=praxis-restore-dev-pass
+      - MONGO_API_USERNAME=api
+      - MONGO_API_PASSWORD=dev-pass
+      - MONGO_API_DATABASE=praxis
+      - MONGO_API_COLLECTION=profiles
+      - MONGO_MIGRTIONS_USERNAME=migrations
+      - MONGO_MIGRTIONS_PASSWORD=dev-pass
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ./Praxis.Bff/mongodb:/data/db
-      - ./Praxis.Bff/data/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./Praxis.Bff/data/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+      - ./Praxis.Bff/mongodb-backups:/var/backups/mongodb
+      - ./Praxis.Bff/data/mongo-restore.sh:/var/mongodb/scripts/mongo-restore.sh:ro
+      - ./Praxis.Bff/data/mongo-backup.sh:/var/mongodb/scripts/mongo-backup.sh:ro
+      - ./Praxis.Bff/data/clean-old-backups.sh:/var/mongodb/scripts/clean-old-backups.sh:ro
 
   praxis_bff:
     environment:
@@ -35,6 +54,37 @@ services:
   nginx:
     ports:
       - "7015:7015"
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+  
+  migrations_api:
+    environment:
+     - NODE_ENV=Development
+     - API_PORT=7018
+     - MONGODB_URL=mongodb://migrations:dev-pass@praxis_mongodb:27017/?authSource=praxis
+     - MONGODB_DATABASENAME=praxis
+    ports:
+      - "7018:7018"
+    volumes:
+      - ./Praxis.Bff/data/migrations/api:/app
+      - /app/node_modules/
+  
+  migrations_ui:
+    environment:
+      - NODE_ENV=Development
+      - UI_PORT=7017
+      - KEY_PATH=/root/https_cert/dev_Praxis_migrations.key
+      - CERT_PATH=/root/https_cert/dev_Praxis_migrations.pem
+    ports:
+      - "7017:7017"
+    volumes:
+      - ./Praxis.Bff/data/migrations/ui:/app
+      - /app/node_modules/
+      - ${APPDATA}/ASP.NET/Https:/root/https_cert:ro
+  
+  migrations_nginx:
+    ports:
+      - "7019:7019"
     volumes:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     

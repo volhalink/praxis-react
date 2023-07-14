@@ -3,7 +3,7 @@ using MongoDB.Bson;
 
 namespace Praxis.Bff.Services
 {
-    public class Profile
+    public class ProfileDto
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -12,5 +12,7 @@ namespace Praxis.Bff.Services
         public string Name { get; set; }
         [BsonElement("email")]
         public string Email { get; set; }
+        [BsonElement("habbits")]
+        public IList<HabitDto>? Habits { get; set; }
     }
 }
