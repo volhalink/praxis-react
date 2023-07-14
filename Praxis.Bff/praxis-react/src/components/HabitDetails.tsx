@@ -16,8 +16,8 @@ function HabitDetails(props: HabitDetailsProps) {
     }
 
     return (
-        <section className="grid content-start min-h-screen w-full rounded-lg bg-violet-light shadow-xl shadow-violet-dark overflow-hidden">
-            <div className="px-5 pt-5 pb-2 flex justify-between text-violet-light bg-violet-dark">
+        <section className="grid content-start min-h-screen w-full rounded-lg bg-main-light shadow-xl shadow-main-dark overflow-hidden">
+            <div className="px-5 pt-5 pb-2 flex justify-between text-main-light bg-main-dark">
                 <div>Details of {props.habit.name}</div>
                 <div>
                     <button onClick={close}>

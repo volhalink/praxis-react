@@ -13,9 +13,9 @@ interface PropsType {
 function Layout(props: PropsType) {
     const user = useUser();
     return (
-        <div className="w-full bg-violet-light text-violet-dark">
-            <div className="sticky top-0 bg-violet-light">
-                <div className="rounded-b-sm bg-violet-dark/[0.5]">
+        <div className="w-full bg-main-light text-main-dark">
+            <div className="sticky top-0 bg-main-light">
+                <div className="rounded-b-sm bg-main-dark/[0.5]">
                     <Header />
                     {user?.isLoggedIn && <div className="hidden sm:block">
                         <Navigation />
@@ -29,7 +29,7 @@ function Layout(props: PropsType) {
                     </Container>
                 </HabitsProvider>
             </div>
-            <div className="sticky bottom-0 rounded-t-sm bg-violet-dark text-violet-light">
+            <div className="sticky bottom-0 rounded-t-sm bg-main-dark text-main-light">
                 <Footer />
             </div>
         </div>

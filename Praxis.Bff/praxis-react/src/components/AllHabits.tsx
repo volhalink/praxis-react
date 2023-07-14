@@ -23,7 +23,7 @@ function AddHabitForm(){
     return (
         <div className="flex flex-nowrap justify-between items-stretch">
             <div className="grow">
-                <input className="h-full w-full bg-violet-dark text-violet-light" type="text" onChange={textChanged} value={habbitName}/>
+                <input className="h-full w-full bg-main-dark text-main-light" type="text" onChange={textChanged} value={habbitName}/>
             </div>
             <div className="grow-0 h-full ml-2">
                 <button className="py-1" onClick={onAddHabbitClick}>
@@ -64,7 +64,7 @@ function HabitsList() {
 
     return (
         <div className="">{habitsState?.habits.map(h => 
-            <div className="mt-3 flex flex-nowrap justify-between items-center border-b-2 border-b-violet-dark">
+            <div className="mt-3 flex flex-nowrap justify-between items-center border-b-2 border-b-main-dark">
                 <div className="grow">
                     <button onClick={() => selectHabit(h)}>
                         {h.name}
