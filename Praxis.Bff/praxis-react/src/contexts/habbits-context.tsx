@@ -3,6 +3,7 @@ import { Dispatch, createContext, useContext, useReducer } from 'react';
 export interface Habit {
     id: string | null,
     name: string,
+    description: string,
     isInProgress: boolean,
 }
 
@@ -11,7 +12,7 @@ interface HabitsState {
     selectedHabit: Habit | null
 }
 
-export type HabitDispatchAction = "getall" | "add" | "delete" | "select" | "deselect" | "go_about_it" | "stop_progress";
+export type HabitDispatchAction = "getall" | "add" | "delete" | "select" | "deselect" | "go_about_it" | "stop_progress" | "update";
 
 export interface HabitsDispatch {
     type: HabitDispatchAction,
@@ -99,6 +100,15 @@ export function HabitsProvider(props: PropsType) {
                 ...oldState,
                 habits: oldState.habits.map((h, i) => {
                     return h.id !== stopProgressHabit.id? h : {...h, isInProgress: false};
+                })
+            };
+        case "update":
+            const updatedHabit = action.data as Habit;    
+            return {    
+                ...oldState,
+                selectedHabit: oldState.selectedHabit?.id === updatedHabit.id? updatedHabit : oldState.selectedHabit,
+                habits: oldState.habits.map((h, i) => {
+                    return h.id !== updatedHabit.id? h : updatedHabit;
                 })
             };
         default: {

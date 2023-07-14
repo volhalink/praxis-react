@@ -12,6 +12,9 @@ namespace Praxis.Bff.Services
         [BsonElement("name")]
         public string Name { get; set; }
 
+        [BsonElement("description")]
+        public string Description { get; set; } = string.Empty;
+
         [BsonElement("isInProgress")]
         public bool IsInProgress { get; set; } = false;
     }

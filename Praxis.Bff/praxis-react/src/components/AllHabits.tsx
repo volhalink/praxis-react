@@ -1,37 +1,66 @@
 import {useState} from 'react';
 import { addHabitAsync, deleteHabitAsync, goAboutItAsync, stopProgressAsync } from '../services/habbits-service';
 import { Habit, useHabits, useHabitsDispatch } from '../contexts/habbits-context';
+import Input from './utils/Input';
+import Textarea from './utils/Textarea';
 import HabitDetails from './HabitDetails';
 
 function AddHabitForm(){
     const habbitsDispatch = useHabitsDispatch();
-    const [habbitName, setHabbitName] = useState<string>("");
-    let textChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [habitName, setHabitName] = useState<string>("");
+    let nameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
         const text = e.target.value;
-        setHabbitName(text);
+        setHabitName(text);
     };
+    const [habitDescription, setHabitDescription] = useState<string>("");
+    let descriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const text = e.target.value;
+        setHabitDescription(text);
+    };
+    const [showForm, setShowForm] = useState<boolean>(false);
     let onAddHabbitClick = async() => {
-        let habbit: Habit = {
+        let habit: Habit = {
             id: null,
-            name: habbitName,
+            name: habitName,
+            description: habitDescription,
             isInProgress: false,
         }
-        setHabbitName("");
-        addHabitAsync(habbit, habbitsDispatch);
+        setHabitName("");
+        setHabitDescription("");
+        await addHabitAsync(habit, habbitsDispatch);
     }
 
     return (
-        <div className="flex flex-nowrap justify-between items-stretch">
-            <div className="grow">
-                <input className="h-full w-full bg-main-dark text-main-light" type="text" onChange={textChanged} value={habbitName}/>
+        <div>
+            <div className="flex flex-nowrap justify-between items-center h-full w-full bg-main-dark/[0.6] text-main-light">
+                <div className="ml-3">
+                    <div className="py-1 font-medium uppercase tracking-wider">Add new habit</div>
+                </div>
+                <div className="mx-2 flex items-center">
+                    <button className="" onClick={()=> { setShowForm(!showForm)}}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
+                            {!showForm?<path stroke-linecap="round" stroke-linejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
+                            : <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />}
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div className="grow-0 h-full ml-2">
-                <button className="py-1" onClick={onAddHabbitClick}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="headerIcon">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </button>
-            </div>
+            {showForm? 
+                <div className="px-3 py-2 rounded-lg text-main-dark bg-main-light">
+                    <div className="mt-2 flex flex-nowrap justify-between items-center">
+                        <Input label="Name" text={habitName} onTextChange={nameChanged} />
+                        <div className="grow-0 h-full ml-2">
+                            <button className="py-1" onClick={onAddHabbitClick}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="headerIcon">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="mt-2">
+                        <Textarea label="Description" text={habitDescription} onTextChange={descriptionChanged} />
+                    </div>
+                </div> : <div></div>}
         </div>
     );
 }
@@ -55,10 +84,17 @@ function HabitsList() {
 
     const selectHabit = (habit: Habit) => {
         if(habitsDispatch){
-            habitsDispatch({
-                type: "select",
-                data: habit
-            })
+            if(habit.id === habitsState?.selectedHabit?.id){
+                habitsDispatch({
+                    type: "deselect",
+                    data: null
+                })
+            } else {
+                habitsDispatch({
+                    type: "select",
+                    data: habit
+                })
+            }   
         }
     }
 
@@ -66,7 +102,7 @@ function HabitsList() {
         <div className="">{habitsState?.habits.map(h => 
             <div className="mt-3 flex flex-nowrap justify-between items-center border-b-2 border-b-main-dark">
                 <div className="grow">
-                    <button onClick={() => selectHabit(h)}>
+                    <button className={habitsState?.selectedHabit?.id === h.id? "font-bold tracking-wide" : ""} onClick={() => selectHabit(h)}>
                         {h.name}
                     </button>
                 </div>
@@ -102,8 +138,8 @@ function HabitsList() {
 function AllHabits() {
     const habitsState = useHabits();
     return (
-        <section className="grid grid-cols-1 sm:grid-cols-3 content-start min-h-screen"> 
-            <div className="flex justify-around sm:justify-start">
+        <section className="flex sm:grid-cols-3 content-start min-h-screen"> 
+            <div className="flex flex-grow-0 justify-around sm:justify-start">
                 <div className="p-5 w-full hidden sm:block sm:max-w-sm">                 
                         <div className="">
                             <AddHabitForm />
@@ -112,7 +148,7 @@ function AllHabits() {
                 </div>
                 <div className="p-5 w-full sm:hidden">
                 {habitsState?.selectedHabit?
-                          <HabitDetails habit={habitsState?.selectedHabit}></HabitDetails>
+                          <HabitDetails></HabitDetails>
                         : <div className="">
                             <AddHabitForm />
                             <HabitsList />
@@ -120,8 +156,8 @@ function AllHabits() {
                 }
                 </div>
             </div>
-            <div className="m-5 col-span-2 hidden sm:block">
-                {habitsState?.selectedHabit && <HabitDetails habit={habitsState?.selectedHabit}></HabitDetails>}
+            <div className="m-5 flex-grow hidden sm:block">
+                {habitsState?.selectedHabit && <HabitDetails></HabitDetails>}
             </div>
         </section>
     );

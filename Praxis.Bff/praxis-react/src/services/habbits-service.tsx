@@ -2,6 +2,7 @@ import { Dispatch } from "react";
 import { Habit, HabitsDispatch } from "../contexts/habbits-context";
 
 const addHabitUrl = "/api/habits";
+const updateHabitUrl = "/api/habits?"
 const getAllHabitsUrl = "/api/habits/all";
 const deleteHabitUrl = "/api/habits?";
 const goAboutIttUrl = "/api/habits/goaboutit?";
@@ -38,6 +39,27 @@ export const addHabitAsync = async (habit: Habit, dispatch: Dispatch<HabitsDispa
         if(data){
             const action: HabitsDispatch = {
                 type: "add",
+                data: data
+            }
+
+            dispatch(action);
+        }
+    }
+}
+
+export const updateHabitAsync = async (habit: Habit, dispatch: Dispatch<HabitsDispatch> | null) => {
+    if(dispatch){
+        const response = await fetch(updateHabitUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(habit),
+        });
+        const data: Habit = await response.json();
+        if(data){
+            const action: HabitsDispatch = {
+                type: "update",
                 data: data
             }
 
