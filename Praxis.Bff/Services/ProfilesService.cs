@@ -43,6 +43,7 @@ namespace Praxis.Bff.Services
             {
                 Id = ObjectId.GenerateNewId().ToString(),
                 Name = habbit.Name,
+                IsInProgress = false,
             };
             var updateDefinition = Builders<ProfileDto>.Update.AddToSet<HabitDto>(p => p.Habits, newHabbit);
             var result = await _profilesCollection.UpdateOneAsync(p => p.Email == email, updateDefinition);
@@ -51,6 +52,7 @@ namespace Praxis.Bff.Services
             {
                 Id = newHabbit.Id,
                 Name = newHabbit.Name,
+                IsInProgress = newHabbit.IsInProgress,
             } : null;
         }
 
@@ -58,6 +60,26 @@ namespace Praxis.Bff.Services
         {
             var updateDefinition = Builders<ProfileDto>.Update.PullFilter(p => p.Habits, h => h.Id == habitId);
             var result = await _profilesCollection.UpdateOneAsync(p => p.Email == email, updateDefinition);
+
+            return result.IsAcknowledged;
+        }
+
+        public async Task<bool> GoAboutItAsync(string email, string habitId)
+        {
+            var filter = Builders<ProfileDto>.Filter.Eq("email", email) &
+                Builders<ProfileDto>.Filter.ElemMatch(p => p.Habits, Builders<HabitDto>.Filter.Eq(h => h.Id, habitId));
+            var update = Builders<ProfileDto>.Update.Set("habbits.$.isInProgress", true);
+            var result = await _profilesCollection.UpdateOneAsync(filter, update);
+
+            return result.IsAcknowledged;
+        }
+
+        public async Task<bool> StopProgressAsync(string email, string habitId)
+        {
+            var filter = Builders<ProfileDto>.Filter.Eq("email", email) &
+                Builders<ProfileDto>.Filter.ElemMatch(p => p.Habits, Builders<HabitDto>.Filter.Eq(h => h.Id, habitId));
+            var update = Builders<ProfileDto>.Update.Set("habbits.$.isInProgress", false);
+            var result = await _profilesCollection.UpdateOneAsync(filter, update);
 
             return result.IsAcknowledged;
         }

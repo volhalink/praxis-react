@@ -1,8 +1,9 @@
 import { Dispatch, createContext, useContext, useReducer } from 'react';
 
 export interface Habit {
-    id: string | null
-    name: string
+    id: string | null,
+    name: string,
+    isInProgress: boolean,
 }
 
 interface HabitsState {
@@ -10,7 +11,7 @@ interface HabitsState {
     selectedHabit: Habit | null
 }
 
-export type HabitDispatchAction = "getall" | "add" | "delete" | "select" | "deselect";
+export type HabitDispatchAction = "getall" | "add" | "delete" | "select" | "deselect" | "go_about_it" | "stop_progress";
 
 export interface HabitsDispatch {
     type: HabitDispatchAction,
@@ -83,6 +84,22 @@ export function HabitsProvider(props: PropsType) {
             return  {
                 ...oldState,
                 selectedHabit: null
+            };
+        case "go_about_it":
+            const goAboutHabit = action.data as Habit;    
+            return {    
+                ...oldState,
+                habits: oldState.habits.map((h, i) => {
+                    return h.id !== goAboutHabit.id? h : {...h, isInProgress: true};
+                })
+            };
+        case "stop_progress":
+            const stopProgressHabit = action.data as Habit;    
+            return {    
+                ...oldState,
+                habits: oldState.habits.map((h, i) => {
+                    return h.id !== stopProgressHabit.id? h : {...h, isInProgress: false};
+                })
             };
         default: {
             throw Error('Unknown action: ' + action.type);

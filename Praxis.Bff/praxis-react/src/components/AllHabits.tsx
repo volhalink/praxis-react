@@ -1,6 +1,6 @@
-import {useState, useEffect} from 'react';
-import { getAllHabitsAsync, addHabitAsync, deleteHabitAsync } from '../services/habbits-service';
-import { Habit, HabitsProvider, useHabits, useHabitsDispatch } from '../contexts/habbits-context';
+import {useState} from 'react';
+import { addHabitAsync, deleteHabitAsync, goAboutItAsync, stopProgressAsync } from '../services/habbits-service';
+import { Habit, useHabits, useHabitsDispatch } from '../contexts/habbits-context';
 import HabitDetails from './HabitDetails';
 
 function AddHabitForm(){
@@ -13,7 +13,8 @@ function AddHabitForm(){
     let onAddHabbitClick = async() => {
         let habbit: Habit = {
             id: null,
-            name: habbitName
+            name: habbitName,
+            isInProgress: false,
         }
         setHabbitName("");
         addHabitAsync(habbit, habbitsDispatch);
@@ -41,7 +42,15 @@ function HabitsList() {
     const habitsDispatch = useHabitsDispatch();
 
     const onClickDelete = (habit: Habit) =>{
-        deleteHabitAsync(habit, habitsDispatch)
+        deleteHabitAsync(habit, habitsDispatch);
+    };
+
+    const onClickGoAboutIt = async(habit: Habit) =>{
+        await goAboutItAsync(habit, habitsDispatch);
+    };
+
+    const onClickStopProgress = async(habit: Habit) =>{
+        await stopProgressAsync(habit, habitsDispatch);
     };
 
     const selectHabit = (habit: Habit) => {
@@ -61,12 +70,29 @@ function HabitsList() {
                         {h.name}
                     </button>
                 </div>
-                <div className="ml-2 grow-0">
-                    <button onClick={() => {onClickDelete(h)}}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="headerIconSmall">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                        </svg>
-                    </button>
+                <div className="grow-0 flex justify-around">
+                    <div className="grow-0">
+                    {h.isInProgress ? 
+                            <button onClick={async() => await onClickStopProgress(h)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="headerIconSmall">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+                            : <button onClick={async() => await  onClickGoAboutIt(h)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="headerIconSmall">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" />
+                                </svg>
+                            </button>
+                            }
+                    </div>
+                    <div className="grow-0">
+                        <button onClick={() => {onClickDelete(h)}}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="headerIconSmall">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>)}
         </div>

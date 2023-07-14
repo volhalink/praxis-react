@@ -1,6 +1,14 @@
 version: '3.4'
 
 services:
+  scheduler:
+    image: mcuadros/ofelia:latest
+    container_name: scheduler
+    depends_on:
+      - mongo
+    networks:
+      - praxis_mongodb
+
   mongo:
     container_name: praxis_mongodb
     image: mongo:6.0.6-jammy
@@ -42,9 +50,45 @@ services:
       - praxis_frontend
     command: [nginx-debug, '-g', 'daemon off;']
 
+  migrations_api:
+    container_name: praxis_migrations_api
+    image: ${DOCKER_REGISTRY-}praxismigrationsapi
+    build:
+      context: .
+      dockerfile: Praxis.Bff/data/migrations/api/Dockerfile
+    networks:
+      - praxis_migrations
+      - praxis_mongodb
+
+  migrations_ui:
+    container_name: praxis_migrations_ui
+    image: ${DOCKER_REGISTRY-}praxismigrationsui
+    build:
+      context: .
+      dockerfile: Praxis.Bff/data/migrations/ui/Dockerfile
+    networks:
+      - praxis_migrations
+
+  migrations_nginx:
+    container_name: praxis_migrations
+    image: nginx:1.24.0
+    volumes:
+     - ./nginx/migrations/templates:/etc/nginx/templates
+    environment:
+     - NGINX_HOST=praxis
+     - NGINX_PORT=7019
+     - API_HOST=praxis_migrations_api
+     - API_PORT=7018
+     - UI_HOST=praxis_migrations_ui
+     - UI_PORT=7017
+    networks:
+      - praxis_migrations
+    command: [nginx-debug, '-g', 'daemon off;']
 
 networks:
   praxis_frontend:
     driver: bridge
   praxis_mongodb:
+    driver: bridge
+  praxis_migrations:
     driver: bridge

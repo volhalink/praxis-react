@@ -4,6 +4,8 @@ import { Habit, HabitsDispatch } from "../contexts/habbits-context";
 const addHabitUrl = "/api/habits";
 const getAllHabitsUrl = "/api/habits/all";
 const deleteHabitUrl = "/api/habits?";
+const goAboutIttUrl = "/api/habits/goaboutit?";
+const stopProgressUrl = "/api/habits/stopprogress?";
 
 export const getAllHabitsAsync = async(dispatch: Dispatch<HabitsDispatch> | null) => {
     if(dispatch){
@@ -59,6 +61,52 @@ export const deleteHabitAsync = async (habit: Habit, dispatch: Dispatch<HabitsDi
         if(deleted){
             const action: HabitsDispatch = {
                 type: "delete",
+                data: habit
+            }
+
+            dispatch(action);
+        }
+    }
+}
+
+export const goAboutItAsync = async (habit: Habit, dispatch: Dispatch<HabitsDispatch> | null) => {
+    if(dispatch && habit.id){
+        const params = (new URLSearchParams([
+            ["habitId", habit.id],
+          ])).toString();
+        const response = await fetch(goAboutIttUrl + params, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const deleted: boolean = await response.json();
+        if(deleted){
+            const action: HabitsDispatch = {
+                type: "go_about_it",
+                data: habit
+            }
+
+            dispatch(action);
+        }
+    }
+}
+
+export const stopProgressAsync = async (habit: Habit, dispatch: Dispatch<HabitsDispatch> | null) => {
+    if(dispatch && habit.id){
+        const params = (new URLSearchParams([
+            ["habitId", habit.id],
+          ])).toString();
+        const response = await fetch(stopProgressUrl + params, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const deleted: boolean = await response.json();
+        if(deleted){
+            const action: HabitsDispatch = {
+                type: "stop_progress",
                 data: habit
             }
 

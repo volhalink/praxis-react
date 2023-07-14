@@ -38,6 +38,28 @@ namespace Praxis.Bff.Endpoints
 
                 return result;
             });
+
+            app.MapPost("/api/habits/goaboutit", async (string habitId, ClaimsPrincipal user, IHabitsService habitsService) =>{
+                string? email = user?.GetEmail();
+                var result = false;
+                if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(habitId))
+                {
+                    result = await habitsService.GoAboutItAsync(email, habitId);
+                }
+
+                return result;
+            });
+
+            app.MapPost("/api/habits/stopprogress", async (string habitId, ClaimsPrincipal user, IHabitsService habitsService) => {
+                string? email = user?.GetEmail();
+                var result = false;
+                if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(habitId))
+                {
+                    result = await habitsService.StopProgressAsync(email, habitId);
+                }
+
+                return result;
+            });
         }
     }
 }
