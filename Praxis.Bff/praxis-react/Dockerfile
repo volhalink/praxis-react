@@ -3,4 +3,4 @@ WORKDIR /app
 EXPOSE 7014
 
 # Start the app
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "docker" ]
