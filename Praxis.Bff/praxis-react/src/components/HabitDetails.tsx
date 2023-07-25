@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Habit, useHabits, useHabitsDispatch } from "../contexts/habbits-context";
-import { updateHabitAsync } from "../services/habbits-service";
+import { Habit, useHabits, useHabitsDispatch } from "../contexts/habits-context";
+import { updateHabitAsync } from "../services/habits-service";
 import Input from "./utils/Input";
 import Textarea from './utils/Textarea';
 
@@ -87,8 +87,7 @@ function HabitDetails() {
     const close = () => {
         if(habitsDispatch){
             habitsDispatch({
-                type: "deselect",
-                data: null
+                type: "deselect"
             });
         }
     }
@@ -119,7 +118,7 @@ function HabitDetails() {
             </div>
             <div>
                 {isEditingForm?
-                  <EditHabitForm initialHabitName={initialHabitName} initialHabitDescription={initialHabitDescription} saveEditing={saveEditing} cancelEditing={cancelEditing} ></EditHabitForm>
+                <EditHabitForm initialHabitName={initialHabitName} initialHabitDescription={initialHabitDescription} saveEditing={saveEditing} cancelEditing={cancelEditing} ></EditHabitForm>
                 : <div className="m-3">
                     <div className={initialHabitDescription? "p-2 w-full rounded-lg border-2 border-main-highlight-light border-spacing-1" : "hidden"}>
                         <div className="text-main-dark tracking-wide italic">

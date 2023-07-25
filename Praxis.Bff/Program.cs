@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -22,10 +23,15 @@ try
 
     var mongoClient = new MongoClient(builder.Configuration["MongoDB:ConnectionString"]);
     var mongoDatabase = mongoClient.GetDatabase(builder.Configuration["MongoDB:DatabaseName"]);
-    var profilesService = new ProfilesService(mongoDatabase, builder.Configuration["MongoDB:ProfilesCollectionName"]);
+    var profilesCollection = mongoDatabase.GetCollection<ProfileDto>(builder.Configuration["MongoDB:ProfilesCollectionName"]);
+
+    builder.Services.AddSingleton<IMongoCollection<ProfileDto>>(profilesCollection);
+    var profilesService = new ProfilesService(profilesCollection);
 
     builder.Services.AddSingleton<IProfilesService>(profilesService);
-    builder.Services.AddSingleton<IHabitsService>(profilesService);
+    builder.Services.AddSingleton<IHabitsService, HabitsService>();
+    builder.Services.AddSingleton<IHabitsProgressService, HabitsProgressService>();
+    builder.Services.AddSingleton<ITimezonesService, TimezonesService>();
 
     builder.Services
         .AddAuthentication(options =>
@@ -37,11 +43,11 @@ try
         {
             options.Events.OnSignedIn = async (context) =>
             {
-                var name = context.Principal?.GetName();
                 var email = context.Principal?.GetEmail();
-                if (!string.IsNullOrWhiteSpace(email))
+                if (!string.IsNullOrWhiteSpace(email) && context.Principal != null)
                 {
-                    await profilesService.AddProfileAsync(email, name);
+                    var profile = context.Principal.GetProfile();
+                    await profilesService.AddProfileAsync(profile);
                 }
             };
         })
@@ -49,6 +55,11 @@ try
         {
             googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
             googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+            googleOptions.Scope.Add("https://www.googleapis.com/auth/userinfo.profile");
+
+            googleOptions.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
+            googleOptions.ClaimActions.MapJsonKey("urn:google:locale", "locale", "string");
+            googleOptions.ClaimActions.MapJsonKey("urn:google:zoneinfo", "zoneinfo", "string"); // zoneinfo
             //googleOptions.UsePkce = true;
         });
 
@@ -69,8 +80,9 @@ try
     app.UseAuthorization();
 
     LoginEndpoints.Map(app);
-    UserEndpoints.Map(app);
+    ProfileEndpoints.Map(app);
     HabitsEndpoints.Map(app);
+    HabitsProgressEndpoints.Map(app);
 
     app.Run();
 }

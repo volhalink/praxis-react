@@ -2,7 +2,7 @@ import React from 'react';
 import Header from './Header';
 import Container from './Container';
 import Footer from './Footer';
-import { HabitsProvider } from '../contexts/habbits-context';
+
 
 interface PropsType {
     children: JSX.Element
@@ -17,11 +17,9 @@ function Layout(props: PropsType) {
                 </div>
             </div>
             <div className="relative bg-endless-clouds-pattern min-h-screen">
-                <HabitsProvider>
-                    <Container>
-                        {props.children}
-                    </Container>
-                </HabitsProvider>
+                <Container>
+                    {props.children}
+                </Container>
             </div>
             <div className="sticky bottom-0 rounded-t-sm bg-main-light ">
                 <div className="bg-main-dark/[0.9] text-main-light">

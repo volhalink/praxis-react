@@ -1,6 +1,6 @@
 import {useState} from 'react';
-import { addHabitAsync, deleteHabitAsync, goAboutItAsync, stopProgressAsync } from '../services/habbits-service';
-import { Habit, useHabits, useHabitsDispatch } from '../contexts/habbits-context';
+import { addHabitAsync, deleteHabitAsync, goAboutItAsync, stopProgressAsync } from '../services/habits-service';
+import { Habit, useHabits, useHabitsDispatch } from '../contexts/habits-context';
 import Input from './utils/Input';
 import Textarea from './utils/Textarea';
 import HabitDetails from './HabitDetails';
@@ -86,8 +86,7 @@ function HabitsList() {
         if(habitsDispatch){
             if(habit.id === habitsState?.selectedHabit?.id){
                 habitsDispatch({
-                    type: "deselect",
-                    data: null
+                    type: "deselect"
                 })
             } else {
                 habitsDispatch({
@@ -148,7 +147,7 @@ function AllHabits() {
                 </div>
                 <div className="p-5 w-full sm:hidden">
                 {habitsState?.selectedHabit?
-                          <HabitDetails></HabitDetails>
+                        <HabitDetails></HabitDetails>
                         : <div className="">
                             <AddHabitForm />
                             <HabitsList />

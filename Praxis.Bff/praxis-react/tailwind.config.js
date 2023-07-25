@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        'xxs': '375px',
+      },
       colors: {
         //'violet-light': '#dfdbe5',
         //'violet-dark': '#9c92ac',

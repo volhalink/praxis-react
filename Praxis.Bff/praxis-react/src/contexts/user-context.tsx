@@ -4,58 +4,83 @@ export interface User {
     isLoggedIn: boolean;
     name: string;
     email: string;
-}
+    picture: string | null;
+    locale: string;
+    timezone: string;
+};
 
-export const anonymousUser = {isLoggedIn: false, name: '', email: ''}
+export interface UserState {
+    user: User,
+    showSpinner: boolean
+};
 
-export type UserDispatchAction = "login" | "logout";
+export interface Timezone {
+    name: string,
+    offset: number
+};
 
-export interface UserDispatch {
+export const anonymousUser = {isLoggedIn: false, name: '', email: '', picture: null, locale: 'en', timezone: 'UTC'};
+const defaultState = {user: anonymousUser, showSpinner: false};
+
+export type UserDispatchAction = "login" | "logout" | "setspinner";
+
+export interface UserStateDispatch {
     type: UserDispatchAction,
-    user: User
+    user?: User,
+    showSpinner?: boolean
 }
 
 interface PropsType {
+    user: User,
     children: JSX.Element
 }
 
-const UserContext = createContext<User | null>(null);
-const UserDispatchContext = createContext<Dispatch<UserDispatch> | null>(null);
+const UserStateContext = createContext<UserState>(defaultState);
+const UserStateDispatchContext = createContext<Dispatch<UserStateDispatch> | null>(null);
 
 
-export function UserProvider(props: PropsType) {
-    const [user, userDispatch] = useReducer(
-      userReducer,
-      anonymousUser
+export function UserStateProvider(props: PropsType) {
+    const initialState = {user: props.user, showSpinner: false};
+    const [userState, userStateDispatch] = useReducer(
+        userStateReducer,
+        initialState
     );
-  
+
     return (
-        <UserContext.Provider value={user}>
-            <UserDispatchContext.Provider value={userDispatch}>
-            <div data-testid="user-provider">
+        <UserStateContext.Provider value={userState}>
+            <UserStateDispatchContext.Provider value={userStateDispatch}>
+            <div data-testid="user-state-provider">
             {props.children}
             </div>
-            </UserDispatchContext.Provider>
-        </UserContext.Provider>
+            </UserStateDispatchContext.Provider>
+        </UserStateContext.Provider>
     );
-  }
+}
 
-  export function useUser() {
-    return useContext(UserContext);
-  }
-  
-  export function useUserDispatch() {
-    return useContext(UserDispatchContext);
-  }
+export function useUserState() {
+    return useContext(UserStateContext);
+}
 
-  function userReducer(olduser: User, action: UserDispatch) {
+export function useUserStateDispatch() {
+    return useContext(UserStateDispatchContext);
+}
+
+function userStateReducer(olduserstate: UserState, action: UserStateDispatch) :UserState {
     switch (action.type) {
         case "login": 
-            return action.user;
+            return {
+                user: action.user ?? olduserstate.user,
+                showSpinner: false,
+            }
         case "logout":
-            return anonymousUser;
+            return defaultState;
+        case "setspinner":
+            return {
+                ...olduserstate,
+                showSpinner: !!(action.showSpinner)
+            }
         default: {
             throw Error('Unknown action: ' + action.type);
         }
     }
-  }
+}

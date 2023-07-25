@@ -5,10 +5,10 @@ import CalendarMenu from './CalendarMenu';
 import Langage from './Language';
 import NavigationButton from './NavigationButton';
 import Navigation from './Navigation';
-import { useUser } from '../contexts/user-context';
+import { useUserState } from '../contexts/user-context';
 
 function Header() {
-    const user = useUser();
+    const {user} = useUserState();
     return (
         <header className="p-3 text-main-navigation-text" >
             <div className="flex items-center justify-between">
