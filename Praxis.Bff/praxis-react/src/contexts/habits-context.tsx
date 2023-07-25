@@ -3,6 +3,7 @@ import { Dispatch, createContext, useContext, useReducer } from 'react';
 export interface Habit {
     id: string | null,
     name: string,
+    description: string,
     isInProgress: boolean,
 }
 
@@ -11,14 +12,15 @@ interface HabitsState {
     selectedHabit: Habit | null
 }
 
-export type HabitDispatchAction = "getall" | "add" | "delete" | "select" | "deselect" | "go_about_it" | "stop_progress";
+export type HabitDispatchAction = "add" | "delete" | "select" | "deselect" | "go_about_it" | "stop_progress" | "update";
 
 export interface HabitsDispatch {
     type: HabitDispatchAction,
-    data: Habit | Habit[] | null
+    data?: Habit | Habit[]
 }
 
 interface PropsType {
+    habits: Habit[],
     children: JSX.Element
 }
 
@@ -27,16 +29,15 @@ const HabitsDispatchContext = createContext<Dispatch<HabitsDispatch> | null>(nul
 
 
 export function HabitsProvider(props: PropsType) {
-    const initialHabits: Habit[] = [];
     const initialState = {
-        habits: initialHabits,
+        habits: props.habits,
         selectedHabit: null
     };
     const [habitsState, habitsDispatch] = useReducer(
-      habbitsReducer,
-      initialState
+        habbitsReducer,
+        initialState
     );
-  
+
     return (
         <HabitsContext.Provider value={habitsState}>
             <HabitsDispatchContext.Provider value={habitsDispatch}>
@@ -46,34 +47,29 @@ export function HabitsProvider(props: PropsType) {
             </HabitsDispatchContext.Provider>
         </HabitsContext.Provider>
     );
-  }
+}
 
-  export function useHabits() {
+export function useHabits() {
     return useContext(HabitsContext);
-  }
-  
-  export function useHabitsDispatch() {
-    return useContext(HabitsDispatchContext);
-  }
+}
 
-  function habbitsReducer(oldState: HabitsState, action: HabitsDispatch) : HabitsState {
+export function useHabitsDispatch() {
+    return useContext(HabitsDispatchContext);
+}
+
+function habbitsReducer(oldState: HabitsState, action: HabitsDispatch) : HabitsState {
     switch (action.type) {
-        case "getall": 
-            return {
-                ...oldState,
-                habits: action.data as Habit[]
-            };
         case "add":
             return action.data? {
                 ...oldState,
                 habits: oldState.habits.concat([action.data as Habit])
-             } : oldState;
+            } : oldState;
         case "delete":
                 const deleteHabit = action.data as Habit;
                 return deleteHabit? {
                     ...oldState,
                     habits: oldState.habits.filter((h, i) => h.id !== deleteHabit.id)
-                 } : oldState;
+                } : oldState;
         case "select":
             const selectHabit = action.data as Habit;
             return  selectHabit?  {
@@ -101,8 +97,17 @@ export function HabitsProvider(props: PropsType) {
                     return h.id !== stopProgressHabit.id? h : {...h, isInProgress: false};
                 })
             };
+        case "update":
+            const updatedHabit = action.data as Habit;    
+            return {    
+                ...oldState,
+                selectedHabit: oldState.selectedHabit?.id === updatedHabit.id? updatedHabit : oldState.selectedHabit,
+                habits: oldState.habits.map((h, i) => {
+                    return h.id !== updatedHabit.id? h : updatedHabit;
+                })
+            };
         default: {
             throw Error('Unknown action: ' + action.type);
         }
     }
-  }
+}

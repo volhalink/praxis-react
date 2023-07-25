@@ -45,11 +45,15 @@ services:
   praxis_frontend:
     environment:
       - NODE_ENV=Development
+      - FRONTEND_PORT=7014
+      - KEY_PATH=/root/https_cert/dev_Praxis.key
+      - CERT_PATH=/root/https_cert/dev_Praxis.pem
     ports:
       - "7014:7014"
     volumes:
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/https_cert:ro
       - ./Praxis.Bff/praxis-react:/app
+      - /app/node_modules/
 
   nginx:
     ports:

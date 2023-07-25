@@ -4,6 +4,7 @@ import Home from './components/Home';
 import AllHabits from './components/AllHabits';
 import CurrentHabits from './components/CurrentHabits';
 import Today from './components/Today';
+import Profile from './components/Profile'
 
 export default class Routes extends Component {
 
@@ -14,6 +15,7 @@ export default class Routes extends Component {
                 <Route path="/all" element={<AllHabits/>} />
                 <Route path="/current" element={<CurrentHabits/>} />
                 <Route path="/today" element={<Today/>} />
+                <Route path="/profile" element={<Profile/>} />
             </ReactRoutes>
     );
   }

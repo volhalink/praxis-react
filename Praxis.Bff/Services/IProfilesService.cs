@@ -1,7 +1,13 @@
-﻿namespace Praxis.Bff.Services
+﻿using Praxis.Bff.Models;
+
+namespace Praxis.Bff.Services
 {
     public interface IProfilesService
     {
-        Task<bool> AddProfileAsync(string email, string? name);
+        Profile? GetProfile(string email);
+
+        Task<Profile?> AddProfileAsync(Profile profile);
+
+        Task<Profile?> SetTimezoneAsync(string email, string timezone);
     }
 }
