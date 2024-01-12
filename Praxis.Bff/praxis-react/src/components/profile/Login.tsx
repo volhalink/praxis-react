@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useUserState } from '../contexts/user-context';
-import { loginWithGoogleUrl, logoutUrl } from '../services/user-service';
+import { useUserState } from '../../contexts/user-context';
+import { loginWithGoogleUrl, logoutUrl } from '../../services/user-service';
 import { NavLink } from 'react-router-dom';
 interface AvatarProps {
     pictureUrl: string | null
@@ -38,11 +38,17 @@ function Login() {
                     <Avatar pictureUrl={user?.picture} />   
                 </button>
                 { isOpen && <button onClick={closeButtonClick} tabIndex={-1} className="fixed z-10 inset-0 h-full w-full bg-main-light opacity-50 cursor-default"></button> }
-                { isOpen && <div onClick={closeButtonClick} className="absolute z-10 right-0 mt-2 w-40 bg-main-dark rounded-t-lg rounded-b-2xl shadow-xl">
-                    <div className="block ml-4 py-1 text-main-light/[0.7] font-bold tracking-wide rounded-lg">
-                        <NavLink to="/profile" className="">Hello {user.name}!</NavLink>
+                { isOpen && <div onClick={closeButtonClick} className="absolute z-10 right-0 mt-2 w-40 bg-main-darker rounded-t-lg rounded-b-lg shadow-xl shadow-main-shadow">
+                    <div className="block ml-4 pt-2 text-main-light/[0.8] font-bold tracking-wide">
+                        Hello {user.name}!
                     </div>
-                    <div className="mt-1 block ml-4 py-1 text-main-light/[0.5] font-semibold rounded-lg hover:text-main-highlight-light">
+                    <div className="block pl-4 pt-3 text-main-light/[0.6] font-semibold tracking-wider uppercase text-sm hover:text-main-highlight-light">
+                        <NavLink to="/profile" className="">Profile</NavLink>
+                    </div>
+                    <div className="block pl-4 pt-3 pb-1 text-main-light/[0.6] font-semibold tracking-wider uppercase text-sm hover:text-main-highlight-light">
+                        <NavLink to="/history" className="">History</NavLink>
+                    </div>
+                    <div className="block pl-4 pt-2 pb-3 border-t border-main-light/[0.5] text-main-light/[0.6] font-semibold tracking-wider uppercase text-sm hover:text-main-highlight-light">
                         <a href={logoutUrl}>Log out</a>
                     </div>
                 </div> }

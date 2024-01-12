@@ -14,10 +14,11 @@ export default {
         //'violet-dark': '#9c92ac',
         'main-light': '#f9f9f5', // olive-50
         'main-dark': '#585e1c', //olive-600
+        'main-darker': 'rgb(47, 48, 19, 80%)', // olive-800/[0.8]
         'main-navigation-text': '#444718', //olive-700
         'main-highlight-light': '#f3f0d9', //olive-100
         'main-highlight-dark': '#e4e0ae', //olive-200
-        'main-shadow': '#444718', // olive-700
+        'main-shadow': '#78716c', // stone-500
         'main-btnsave-bg': '#8f974a', // olive-400
         'main-btnsave-text': '#444718', // olive-700
         'main-btncancel-bg': '#d28448', // cocoa-400

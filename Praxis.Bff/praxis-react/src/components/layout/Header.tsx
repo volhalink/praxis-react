@@ -1,11 +1,11 @@
 import React from 'react';
 import Logo from './Logo';
-import Login from './Login';
-import CalendarMenu from './CalendarMenu';
-import Langage from './Language';
-import NavigationButton from './NavigationButton';
-import Navigation from './Navigation';
-import { useUserState } from '../contexts/user-context';
+import Login from '../profile/Login';
+import CalendarMenu from '../progress/CalendarMenu';
+import Language from '../profile/Language';
+import NavigationButton from './navigation/NavigationButton';
+import Navigation from './navigation/Navigation';
+import { useUserState } from '../../contexts/user-context';
 
 function Header() {
     const {user} = useUserState();
@@ -17,7 +17,7 @@ function Header() {
                 <Navigation />
             </div>}
             <div className="flex items-center justify-between">
-                <Langage/>
+                <Language/>
                 { user?.isLoggedIn && <CalendarMenu /> }
                 <Login />
                 { user?.isLoggedIn && <NavigationButton/> }

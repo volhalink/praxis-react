@@ -10,9 +10,9 @@ interface PropsType {
 
 function Layout(props: PropsType) {
     return (
-        <div className="relative w-full bg-main-light">
+        <div className="relative w-full bg-main-light text-main-darker">
             <div className="sticky z-50 top-0 bg-main-light">
-                <div className="rounded-b-sm bg-main-dark/[0.6]">
+                <div className="rounded-b-sm bg-main-dark/[0.6] shadow-lg shadow-main-shadow">
                     <Header />
                 </div>
             </div>
@@ -22,7 +22,7 @@ function Layout(props: PropsType) {
                 </Container>
             </div>
             <div className="sticky bottom-0 rounded-t-sm bg-main-light ">
-                <div className="bg-main-dark/[0.9] text-main-light">
+                <div className="bg-main-darker text-main-light">
                     <Footer />
                 </div>
             </div>

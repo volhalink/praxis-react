@@ -7,7 +7,7 @@ function NavigationButton() {
     const closeButtonClick = () => { setIsOpen(false); };
     return (
         <div className="sm:hidden">
-            <div className="ml-3 hover:text-main-highlight-dark">
+            <div className="ml-3 box-border hover:text-main-highlight-dark">
                 <button type="button" onClick={toggleButton} className="relative z-15 block focus:text-main-highlight-dark focus:outline-none">
                     <svg className="headerIcon fill-current" viewBox="0 0 24 24">
                         { isOpen? 

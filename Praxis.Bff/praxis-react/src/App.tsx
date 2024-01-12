@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Routes from './Routes';
-import Layout from './components/Layout';
+import Layout from './components/layout/Layout';
 import { User, anonymousUser, UserStateProvider } from './contexts/user-context';
 import { Habit, HabitsProvider } from './contexts/habits-context';
 import { HistoryItem, HistoryProvider } from './contexts/history-context';

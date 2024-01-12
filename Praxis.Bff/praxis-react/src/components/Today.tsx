@@ -1,83 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Habit, useHabits } from '../contexts/habits-context';
-import { HistoryItem, useHistory, getHistoryItem, useHistoryDispatch } from '../contexts/history-context';
-import { accomplishAsync, deleteAccomplishmentAsync } from '../services/history-service';
+import { useHistory } from '../contexts/history-context';
+import AccomplishmentForm from './progress/AccomplishmentForm';
+import HabitHistoryForTheDate from './progress/HabitHistoryForTheDate';
 import {DateTime} from 'luxon';
-
-interface AccomplishmentFormProps {
-    habitId: string,
-    today: DateTime,
-}
-
-function AccomplishmentForm(props: AccomplishmentFormProps) {
-    const {habitId, today} = props;
-    const dispatch = useHistoryDispatch();
-    const [comment, setComment] = useState('');
-
-    const complete = () => {
-        const historyOfToday = getHistoryItem(habitId, today, comment);
-        setComment('');
-        accomplishAsync(historyOfToday, dispatch);
-    }
-
-    return (
-        <div className="flex width-full justify-around items-center text-main-dark">
-            <div className="w-full">
-                <input className="w-full border border-main-highlight-dark/60" value={comment} onChange={(e) => {setComment(e.target.value)}}></input>
-            </div>
-            <div className="ml-1 flex-grow-0 flex items-center">
-                <button onClick={complete}>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="headerIconSmall">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                </button>
-            </div>
-        </div>
-    );
-}
-
-
-interface HistoryForToday {
-    date: DateTime,
-    habitHistory: HistoryItem[],
-    showExactDateTime: boolean
-}
-
-function HabitHistoryForTheDate(props: HistoryForToday) {
-    const {date, habitHistory, showExactDateTime} = props;
-    const dispatch = useHistoryDispatch();
-
-    const isToday = (d: DateTime) => {
-        return date.hasSame(d, 'day');
-    }
-    const history = habitHistory.filter(hi => isToday(hi.accomplishmentDate))/*.sort((a,b) => {
-        const d = (b as any).accomplishmentDate.diff(a.accomplishmentDate);
-        return d.milliseconds;
-    })*/;
-    
-    const deleteAccomplishment = (id: string) => {
-        deleteAccomplishmentAsync(id, dispatch);
-    }
-
-    return (
-    <div className="text-main-dark">      
-        {
-            history.map(hi => {
-                return <div className="flex items-center justify-between">
-                    <div className="flex-shrink-0 italic">{showExactDateTime? hi.accomplishmentDate.toLocaleString(DateTime.DATETIME_MED) : hi.accomplishmentDate.diffNow().toHuman()}</div>
-                    <div className="ml-2 flex-grow">{hi.comment}</div>
-                    <div className="flex-grow-0 flex items-center">
-                        <button onClick={() => hi.id && deleteAccomplishment(hi.id)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="headerIconSmall">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        </button>
-                    </div>
-                </div>
-            })
-        }
-    </div>);
-}
 
 interface HabitHistoryProps {
     habit: Habit,
@@ -104,10 +30,10 @@ function HabitHistory(props: HabitHistoryProps) {
                         </div>
                 </div>
                 {habitHistory.length > 0 && <div className="p-3">
-                    <HabitHistoryForTheDate date={today}  habitHistory={habitHistory} showExactDateTime={true} />
+                    <HabitHistoryForTheDate date={today}  habitHistory={habitHistory} format="time" />
                 </div>}
                 <div className="p-3">
-                    {habit.id && <AccomplishmentForm today={today} habitId={habit.id} />}
+                    {habit.id && <AccomplishmentForm date={today} habitId={habit.id} />}
                 </div>
             </section>}
         </div>);
@@ -134,7 +60,7 @@ function Today() {
             <div className="p-3 sm:flex items-start">
                 <div className="p-3 flex-grow-0">
                 {habitsState?.habits.filter(h => h.isInProgress).map(h =>
-                    <div className="pb-1 font-semibold tracking-wider text-main-dark/[0.8]">
+                    <div key={h.id} className="pb-1 font-semibold tracking-wider text-main-dark/[0.8]">
                         <button onClick={() => onShowHistory(h)} >
                             <div className={"uppercase" + (selectedHabit && selectedHabit.id === h.id? " text-main-dark/[0.5]" : "")}>{h.name}</div>
                         </button>

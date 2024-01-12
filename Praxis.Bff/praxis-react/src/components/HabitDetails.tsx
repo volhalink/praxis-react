@@ -14,13 +14,13 @@ interface EditHabitFormProps {
 function EditHabitForm(props: EditHabitFormProps){
     const {initialHabitName, initialHabitDescription, saveEditing, cancelEditing} = props;
     const [habitName, setHabitName] = useState<string>(initialHabitName);
-    let nameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
         const text = e.target.value;
         setHabitName(text);
 
     };
     const [habitDescription, setHabitDescription] = useState<string>(initialHabitDescription);
-    let descriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const descriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const text = e.target.value;
         setHabitDescription(text);
     };
@@ -57,9 +57,13 @@ function EditHabitForm(props: EditHabitFormProps){
     );
 }
 
+interface HabitDetailsProps {
+    headerBgColor: string,
+}
 
 
-function HabitDetails() {
+function HabitDetails(props: HabitDetailsProps) {
+    const { headerBgColor } = props;
     const habitsState = useHabits();
     const habitsDispatch = useHabitsDispatch();
     const initialHabitName = habitsState?.selectedHabit?.name ?? "";
@@ -94,7 +98,7 @@ function HabitDetails() {
 
     return (
         <section className="relative grid content-start min-h-fit md:max-w-md w-full rounded-lg bg-main-light shadow-xl shadow-main-shadow/[0.5] overflow-hidden">
-            <div className="px-5 pt-5 pb-2 flex justify-between text-main-light bg-main-dark/[0.9]">
+            <div className={"px-5 pt-5 pb-2 flex justify-between text-main-light " + headerBgColor}>
                 <div className="uppercase font-normal tracking-widest">{initialHabitName}</div>
                 <div className="flex items-center justify-between">
                     {

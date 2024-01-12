@@ -5,21 +5,26 @@ import Input from './utils/Input';
 import Textarea from './utils/Textarea';
 import HabitDetails from './HabitDetails';
 
-function AddHabitForm(){
+interface AddHabitFormProps {
+    headerBgColor: string,
+}
+
+function AddHabitForm(props: AddHabitFormProps){
+    const {headerBgColor} = props;
     const habbitsDispatch = useHabitsDispatch();
     const [habitName, setHabitName] = useState<string>("");
-    let nameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
         const text = e.target.value;
         setHabitName(text);
     };
     const [habitDescription, setHabitDescription] = useState<string>("");
-    let descriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const descriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const text = e.target.value;
         setHabitDescription(text);
     };
     const [showForm, setShowForm] = useState<boolean>(false);
-    let onAddHabbitClick = async() => {
-        let habit: Habit = {
+    const onAddHabbitClick = async() => {
+        const habit: Habit = {
             id: null,
             name: habitName,
             description: habitDescription,
@@ -32,15 +37,15 @@ function AddHabitForm(){
 
     return (
         <div>
-            <div className="flex flex-nowrap justify-between items-center h-full w-full bg-main-dark/[0.6] text-main-light">
+            <div className={"flex flex-nowrap justify-between items-center h-full w-full text-main-light " + headerBgColor}>
                 <div className="ml-3">
                     <div className="py-1 font-medium uppercase tracking-wider">Add new habit</div>
                 </div>
                 <div className="mx-2 flex items-center">
                     <button className="" onClick={()=> { setShowForm(!showForm)}}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
-                            {!showForm?<path stroke-linecap="round" stroke-linejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
-                            : <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            {!showForm?<path strokeLinecap="round" strokeLinejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
+                            : <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />}
                         </svg>
                     </button>
                 </div>
@@ -65,8 +70,13 @@ function AddHabitForm(){
     );
 }
 
+interface HabitsListProps {
+    buttonsTextColor: string,
+}
 
-function HabitsList() {
+
+function HabitsList(props: HabitsListProps) {
+    const { buttonsTextColor } = props;
     const habitsState = useHabits();
     const habitsDispatch = useHabitsDispatch();
 
@@ -99,13 +109,13 @@ function HabitsList() {
 
     return (
         <div className="">{habitsState?.habits.map(h => 
-            <div className="mt-3 flex flex-nowrap justify-between items-center border-b-2 border-b-main-dark">
+            <div key={h.id} className="mt-3 flex flex-nowrap justify-between items-center border-b border-b-main-dark/[0.2]">
                 <div className="grow">
                     <button className={habitsState?.selectedHabit?.id === h.id? "font-bold tracking-wide" : ""} onClick={() => selectHabit(h)}>
                         {h.name}
                     </button>
                 </div>
-                <div className="grow-0 flex justify-around">
+                <div className={"grow-0 ml-2 flex justify-around " + buttonsTextColor}>
                     <div className="grow-0">
                     {h.isInProgress ? 
                             <button onClick={async() => await onClickStopProgress(h)}>
@@ -136,27 +146,30 @@ function HabitsList() {
 
 function AllHabits() {
     const habitsState = useHabits();
+    const color = habitsState?.selectedHabit? "-main-dark/[0.7]" : "-main-dark/[0.8]";
+    const bgColor = "bg" + color;
+    const textColor = "text" + color;
     return (
         <section className="flex sm:grid-cols-3 content-start min-h-screen"> 
             <div className="flex flex-grow-0 justify-around sm:justify-start">
-                <div className="p-5 w-full hidden sm:block sm:max-w-sm">                 
-                        <div className="">
-                            <AddHabitForm />
-                            <HabitsList />
-                        </div>
+                <div className="p-5 w-full hidden sm:block sm:max-w-sm md:max-w-md">                 
+                    <div className="p-3 w-full h-full bg-main-light rounded-lg shadow-md shadow-main-shadow">
+                        <AddHabitForm headerBgColor={bgColor} />
+                        <HabitsList buttonsTextColor={textColor} />
+                    </div>
                 </div>
-                <div className="p-5 w-full sm:hidden">
+                <div className="p-5 w-full sm:hidden bg-main-light">
                 {habitsState?.selectedHabit?
-                        <HabitDetails></HabitDetails>
+                        <HabitDetails headerBgColor={"bg-main-dark/[0.8]"}></HabitDetails>
                         : <div className="">
-                            <AddHabitForm />
-                            <HabitsList />
+                            <AddHabitForm headerBgColor={bgColor} />
+                            <HabitsList buttonsTextColor={textColor} />
                         </div>
                 }
                 </div>
             </div>
             <div className="m-5 flex-grow hidden sm:block">
-                {habitsState?.selectedHabit && <HabitDetails></HabitDetails>}
+                {habitsState?.selectedHabit && <HabitDetails headerBgColor={"bg-main-dark/[0.8]"}></HabitDetails>}
             </div>
         </section>
     );

@@ -1,6 +1,6 @@
 import {DateTime} from 'luxon';
-import {Timezone} from '../contexts/user-context';
-import Select from './utils/Select';
+import {Timezone} from '../../contexts/user-context';
+import Select from '../utils/Select';
 
 interface TimezoneSelctorProps {
     initialTimezone: string,

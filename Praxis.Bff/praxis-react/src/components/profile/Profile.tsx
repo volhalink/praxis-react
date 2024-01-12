@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useUserState, useUserStateDispatch } from '../contexts/user-context';
-import { setTimezone } from '../services/user-service';
+import { useUserState, useUserStateDispatch } from '../../contexts/user-context';
+import { setTimezone } from '../../services/user-service';
 import TimezoneSelctor from './TimezoneSelector';
-import Spinner from './utils/Spinner'
+import Spinner from '../utils/Spinner'
 
 
 function Profile() {
